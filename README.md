@@ -1,6 +1,6 @@
 # Swagger merger
 
-To merge a few swagger YAML files into one.
+To merge a few swagger JSON files into one.
 
 Install Go if you don't have one.
 
@@ -8,12 +8,12 @@ Install Go if you don't have one.
 
 Install the command line tool first.
 
-	go get github.com/g3co/go-swagger-merger
+	go get github.com/ntauth/go-swagger-merger
 
 
-The command below will merge ``/data/swagger1.yaml`` ``/data/swagger2.yaml`` and save result file in the ``/data/swagger.yaml``. The library supports more than two files to merge. You can add more paths to the list ``/data/swagger3.yaml``, ``/data/swaggerN.yaml``. 
+The command below will merge ``/data/swagger1.json`` ``/data/swagger2.json`` and save result file in the ``/data/swagger.json``. The library supports more than two files to merge. You can add more paths to the list ``/data/swagger3.json``, ``/data/swaggerN.json``. 
 
-	go-swagger-merger -o /data/swagger.yaml /data/swagger1.yaml /data/swagger2.yaml
+	go-swagger-merger -o /data/swagger.json /data/swagger1.json /data/swagger2.json
 
 
 Attention. The order of the files is essential, and the following file overwrites the same fields from the previous file.

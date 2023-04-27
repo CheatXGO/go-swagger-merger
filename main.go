@@ -2,7 +2,8 @@ package main
 
 import (
 	"flag"
-	"github.com/g3co/go-swagger-merger/helpers"
+
+	"github.com/ntauth/go-swagger-merger/helpers"
 )
 
 func main() {
@@ -10,7 +11,7 @@ func main() {
 
 	var outputFileName string
 
-	flag.StringVar(&outputFileName, "o", "swag.yaml", "")
+	flag.StringVar(&outputFileName, "o", "apis.swagger.json", "")
 	flag.Parse()
 
 	for _, f := range flag.Args() {
@@ -25,6 +26,3 @@ func main() {
 		panic(err)
 	}
 }
-
-
-

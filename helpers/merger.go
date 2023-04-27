@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"github.com/ghodss/yaml"
+	"encoding/json"
 	"io/ioutil"
 	"os"
 )
@@ -29,7 +29,7 @@ func (m *Merger) AddFile(file string) error {
 	}
 
 	var s1 interface{}
-	err = yaml.Unmarshal(content, &s1)
+	err = json.Unmarshal(content, &s1)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (m *Merger) merge(f map[string]interface{}) error {
 }
 
 func (m *Merger) Save(fileName string) error {
-	res, _ := yaml.Marshal(m.Swagger)
+	res, _ := json.Marshal(m.Swagger)
 
 	f, err := os.Create(fileName)
 	if err != nil {
