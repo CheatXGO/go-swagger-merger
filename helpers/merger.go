@@ -56,7 +56,7 @@ func (m *Merger) merge(f map[string]interface{}) error {
 }
 
 func (m *Merger) Save(fileName string) error {
-	res, _ := json.Marshal(m.Swagger)
+	res, _ := json.MarshalIndent(m.Swagger, "", "    ")
 
 	f, err := os.Create(fileName)
 	if err != nil {
