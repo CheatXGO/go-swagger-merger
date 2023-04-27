@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/ntauth/go-swagger-merger/helpers"
+	"golang.org/x/exp/slices"
 )
 
 func main() {
@@ -14,7 +15,12 @@ func main() {
 	flag.StringVar(&outputFileName, "o", "apis.swagger.json", "")
 	flag.Parse()
 
-	for _, f := range flag.Args() {
+	// Sort the files lexicographically so that the swagger annotations
+	// artifact always comes first.
+	files := flag.Args()
+	slices.Sort(files)
+
+	for _, f := range files {
 		err := merger.AddFile(f)
 		if err != nil {
 			panic(err)
