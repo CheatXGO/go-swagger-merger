@@ -15,10 +15,13 @@ func main() {
 	flag.StringVar(&outputFileName, "o", "apis.swagger.json", "")
 	flag.Parse()
 
-	// Sort the files lexicographically so that the swagger annotations
-	// artifact always comes first.
+	// Sort the files lexicographically in reverse so that the swagger annotations
+	// artifact always comes last. This is required so that the merged file contains
+	// the annotations info.
 	files := flag.Args()
-	slices.Sort(files)
+	slices.SortFunc(files, func(f1, f2 string) bool {
+		return f1 > f2
+	})
 
 	for _, f := range files {
 		err := merger.AddFile(f)
