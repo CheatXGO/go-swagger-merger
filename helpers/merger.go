@@ -1,9 +1,10 @@
 package helpers
 
 import (
-	"encoding/json"
-	"io/ioutil"
+	"io"
 	"os"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 type Merger struct {
@@ -16,38 +17,44 @@ func NewMerger() *Merger {
 	return merger
 }
 
-func (m *Merger) AddFile(file string) error {
+func (m *Merger) AddFile(file, title string) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	if err != nil {
 		return err
 	}
 
 	var s1 interface{}
-	err = json.Unmarshal(content, &s1)
+	err = jsoniter.Unmarshal(content, &s1)
 	if err != nil {
 		return err
 	}
 
-	return m.merge(s1.(map[string]interface{}))
+	return m.merge(s1.(map[string]interface{}), title)
 }
 
-func (m *Merger) merge(f map[string]interface{}) error {
+func (m *Merger) merge(f map[string]interface{}, title string) error {
 	for key, item := range f {
 		if i, ok := item.(map[string]interface{}); ok {
 			for subKey, subitem := range i {
 				if _, ok := m.Swagger[key]; !ok {
 					m.Swagger[key] = map[string]interface{}{}
 				}
+				if subKey == "title" {
+					subitem = title
+				}
 
 				m.Swagger[key].(map[string]interface{})[subKey] = subitem
 			}
 		} else {
+			if key == "title" {
+				item = title
+			}
 			m.Swagger[key] = item
 		}
 	}
@@ -56,7 +63,7 @@ func (m *Merger) merge(f map[string]interface{}) error {
 }
 
 func (m *Merger) Save(fileName string) error {
-	res, _ := json.MarshalIndent(m.Swagger, "", "    ")
+	res, _ := jsoniter.MarshalIndent(m.Swagger, "", "    ")
 
 	f, err := os.Create(fileName)
 	if err != nil {

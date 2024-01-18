@@ -3,16 +3,20 @@ package main
 import (
 	"flag"
 
-	"github.com/ntauth/go-swagger-merger/helpers"
+	"github.com/CheatXGO/go-swagger-merger/helpers"
 	"golang.org/x/exp/slices"
 )
 
 func main() {
 	merger := helpers.NewMerger()
 
-	var outputFileName string
+	var (
+		outputFileName string
+		outputTitle    string
+	)
 
 	flag.StringVar(&outputFileName, "o", "apis.swagger.json", "")
+	flag.StringVar(&outputTitle, "t", "title", "")
 	flag.Parse()
 
 	// Sort the files lexicographically in reverse so that the swagger annotations
@@ -24,7 +28,7 @@ func main() {
 	})
 
 	for _, f := range files {
-		err := merger.AddFile(f)
+		err := merger.AddFile(f, outputTitle)
 		if err != nil {
 			panic(err)
 		}
