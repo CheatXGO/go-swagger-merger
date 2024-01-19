@@ -1,23 +1,26 @@
 package helpers
 
 import (
+	"encoding/json"
 	"io"
 	"os"
-
-	jsoniter "github.com/json-iterator/go"
 )
 
 type Merger struct {
 	Swagger map[string]interface{}
+	Title   string
+	Version string
 }
 
-func NewMerger() *Merger {
-	merger := new(Merger)
-	merger.Swagger = map[string]interface{}{}
-	return merger
+func NewMerger(title, version string) *Merger {
+	return &Merger{
+		Swagger: make(map[string]interface{}),
+		Title:   title,
+		Version: version,
+	}
 }
 
-func (m *Merger) AddFile(file, title string) error {
+func (m *Merger) AddFile(file string) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return err
@@ -30,40 +33,45 @@ func (m *Merger) AddFile(file, title string) error {
 	}
 
 	var s1 interface{}
-	err = jsoniter.Unmarshal(content, &s1)
+	err = json.Unmarshal(content, &s1)
 	if err != nil {
 		return err
 	}
 
-	return m.merge(s1.(map[string]interface{}), title)
+	return m.merge(s1.(map[string]interface{}))
 }
 
-func (m *Merger) merge(f map[string]interface{}, title string) error {
+func (m *Merger) merge(f map[string]interface{}) error {
 	for key, item := range f {
 		if i, ok := item.(map[string]interface{}); ok {
 			for subKey, subitem := range i {
 				if _, ok := m.Swagger[key]; !ok {
 					m.Swagger[key] = map[string]interface{}{}
 				}
-				if subKey == "title" {
-					subitem = title
-				}
 
-				m.Swagger[key].(map[string]interface{})[subKey] = subitem
+				m.Swagger[key].(map[string]interface{})[subKey] = m.checkBaseHeaders(subKey, subitem)
 			}
 		} else {
-			if key == "title" {
-				item = title
-			}
-			m.Swagger[key] = item
+			m.Swagger[key] = m.checkBaseHeaders(key, item)
 		}
 	}
 
 	return nil
 }
 
+func (m *Merger) checkBaseHeaders(header string, item interface{}) interface{} {
+	switch header {
+	case "title":
+		return m.Title
+	case "version":
+		return m.Version
+	default:
+		return item
+	}
+}
+
 func (m *Merger) Save(fileName string) error {
-	res, _ := jsoniter.MarshalIndent(m.Swagger, "", "    ")
+	res, _ := json.MarshalIndent(m.Swagger, "", "    ")
 
 	f, err := os.Create(fileName)
 	if err != nil {
